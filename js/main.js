@@ -4,11 +4,11 @@ document.addEventListener("DOMContentLoaded", function () {
   const editor = document.getElementById("editor");
   const previewFrame = document.getElementById("previewFrame");
   const downloadBtn = document.getElementById("downloadBtn");
+  const syncBtn = document.getElementById("syncBtn");
 
   const spanColor = document.getElementById("spanColor");
   const spanPadding = document.getElementById("spanPadding");
-  const spanFontSize = document.getElementById("spanFontSize");
-  const bColor = document.getElementById("bColor");
+  const fontSize = document.getElementById("fontSize");
   const fontFamily = document.getElementById("fontFamily");
   const lineHeight = document.getElementById("lineHeight");
   const gapPadding = document.getElementById("gapPadding");
@@ -35,14 +35,14 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // ----------------------------
-  // 기존 스타일 제거(교체) 유틸
+  // 기존 스타일 제거(교체용)
   // ----------------------------
-  function stripConflictingStyles(html) {
-    // 문서 내 <style>, <link rel="stylesheet"> 제거
+  function stripStyles(html) {
+    // <style>, <link rel="stylesheet"> 제거
     html = html.replace(/<style[\s\S]*?<\/style>/gi, "");
     html = html.replace(/<link[^>]*rel=["']?stylesheet["']?[^>]*>/gi, "");
 
-    // span 인라인 스타일은 그대로 두고, b, gap, wrap, msg는 제거
+    // 특정 태그의 인라인 스타일 제거 (span 제외)
     html = html.replace(/(<b\b[^>]*?)\s*style="[^"]*"/gi, "$1");
     html = html.replace(/(<[^>]*class="[^"]*\bgap\b[^"]*"[^>]*?)\s*style="[^"]*"/gi, "$1");
     html = html.replace(/(<[^>]*class="[^"]*\bccfolia_wrap\b[^"]*"[^>]*?)\s*style="[^"]*"/gi, "$1");
@@ -66,9 +66,9 @@ document.addEventListener("DOMContentLoaded", function () {
   // 스타일 생성
   // ----------------------------
   function buildStyle() {
-    const wrapColor = wrapBg.value; // 투명도 없이 hex 그대로
+    const wrapColor = wrapBg.value; // 투명도 없는 wrap 배경
     const msgColor = hexToRgba(msgBg.value, msgAlpha.value);
-    const fs = `${spanFontSize.value}px`;
+    const fs = `${fontSize.value}px`;
     const lh = `${lineHeight.value}`;
 
     return `
@@ -88,7 +88,6 @@ document.addEventListener("DOMContentLoaded", function () {
           line-height: ${lh};
         }
         b {
-          color: ${bColor.value};
           font-size: ${fs};
           font-family: ${fontFamily.value};
           line-height: ${lh};
@@ -107,7 +106,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // 미리보기 갱신
   // ----------------------------
   function updatePreview(syncEditor = false) {
-    const sanitized = stripConflictingStyles(editor.value);
+    const sanitized = stripStyles(editor.value);
     const style = buildStyle();
 
     const html = `<!DOCTYPE html>
@@ -130,20 +129,18 @@ ${style}
   // 이벤트 연결
   // ----------------------------
   [
-    spanColor, spanPadding, spanFontSize, bColor,
-    fontFamily, lineHeight, gapPadding, gapAlign,
-    wrapBg, msgBg, msgAlpha
+    spanColor, spanPadding, fontSize, fontFamily, lineHeight,
+    gapPadding, gapAlign, wrapBg, msgBg, msgAlpha
   ].forEach(el => el && el.addEventListener("input", () => updatePreview(true)));
 
   editor.addEventListener("input", () => updatePreview(false));
-
-  document.getElementById("syncBtn").addEventListener("click", () => updatePreview(true));
+  syncBtn.addEventListener("click", () => updatePreview(true));
 
   // ----------------------------
   // 다운로드
   // ----------------------------
   downloadBtn.addEventListener("click", () => {
-    const sanitized = stripConflictingStyles(editor.value);
+    const sanitized = stripStyles(editor.value);
     const out = `<!DOCTYPE html>
 <html>
 <head><meta charset="UTF-8"></head>
