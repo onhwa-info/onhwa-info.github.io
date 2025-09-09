@@ -16,15 +16,21 @@
 
 <h2>스타일 옵션</h2>
 <div class="style-controls">
-  <label>span 배경색: <input type="color" id="spanBgColor" value="#000000"></label>
+  <!-- span 배경색은 wrapBg와 연동되며 비활성화됨(표시용) -->
+  <label>span 배경색(연동): <input type="color" id="spanBgColor" value="#000000" disabled></label>
+
   <label>span 글자색: <input type="color" id="spanColor" value="#ffffff"></label>
-  <label>span padding(px): <input type="number" id="spanPadding" value="5"></label>
-  <label>span 글꼴 크기(px): <input type="number" id="spanFontSize" value="14"></label>
-  <label>b 글자색: <input type="color" id="bColor" value="gray"></label>
+  <label>span,b padding(px): <input type="number" id="spanPadding" value="5"></label>
+
+  <!-- 폰트 크기 통합: span,b 공통 -->
+  <label>span,b 글꼴 크기(px): <input type="number" id="spanFontSize" value="14"></label>
+
+  <!-- bColor 제거 -->
   <label>span,b 글꼴: <input type="text" id="fontFamily" value="Arial"></label>
   <label>span,b 줄간격(line-height): <input type="number" step="0.1" id="lineHeight" value="1.5"></label>
+
   <label>.gap padding(px): <input type="number" id="gapPadding" value="16"></label>
-  <label>.gap align-items: 
+  <label>.gap align-items:
     <select id="gapAlign">
       <option value="flex-start">flex-start</option>
       <option value="center">center</option>
@@ -34,6 +40,7 @@
   <label>.ccfolia_wrap 배경색: <input type="color" id="wrapBg" value="#2c2c2cde"></label>
   <label>.msg_container 배경색: <input type="color" id="msgBg" value="#00000033"></label>
 </div>
+
 
 <h2>렌더링 미리보기</h2>
 <iframe id="previewFrame"></iframe>
