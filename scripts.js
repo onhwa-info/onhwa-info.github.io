@@ -17,55 +17,36 @@ const gapAlign = document.getElementById("gapAlign");
 const wrapBg = document.getElementById("wrapBg");
 const msgBg = document.getElementById("msgBg");
 
-// ----------------------------
-// HTML 뷰티파이 함수
-// ----------------------------
-function beautifyHTML(code) {
-  const tab = "  ";
-  let result = "", indent=0;
-  code.split(/>\s*</).forEach((element) => {
-    if (element.match(/^\/\w/)) indent--;
-    result += tab.repeat(indent) + "<" + element + ">\n";
-    if (element.match(/^<?\w[^>]*[^\/]$/) && !element.startsWith("!")) indent++;
-  });
-
-  // 모든 <hr> 제거
-  result = result.replace(/<hr[^>]*>/gi, '');
-  return result.trim();
-}
+let htmlContent = "";
 
 // ----------------------------
-// 파일 업로드 → 에디터 + 미리보기
+// HTML 파일 읽기
 // ----------------------------
 fileInput.addEventListener("change", (e) => {
   const file = e.target.files[0];
   if (!file) return;
-
   const reader = new FileReader();
   reader.onload = (event) => {
-    editor.value = event.target.result;
+    htmlContent = event.target.result;
+    editor.value = htmlContent;
     updatePreview();
   };
   reader.readAsText(file);
 });
 
 // ----------------------------
-// 에디터 입력 시 실시간 미리보기
+// 미리보기 업데이트
 // ----------------------------
-editor.addEventListener("input", updatePreview);
+editor.addEventListener("input", () => {
+  htmlContent = editor.value;
+  updatePreview();
+});
 
-// ----------------------------
-// 스타일 변경 시 반영
-// ----------------------------
-[
-  spanBgColor, spanColor, spanPadding, spanFontSize,
-  bColor, fontFamily, lineHeight, gapPadding, gapAlign, wrapBg, msgBg
+[spanBgColor, spanColor, spanPadding, spanFontSize,
+bColor, fontFamily, lineHeight, gapPadding, gapAlign, wrapBg, msgBg
 ].forEach(el => el.addEventListener("input", updatePreview));
 
 function updatePreview() {
-  let html = editor.value;
-
-  // 사용자 스타일 삽입
   const style = `
     <style>
       .ccfolia_wrap { background-color: ${wrapBg.value}; }
@@ -73,33 +54,44 @@ function updatePreview() {
       span { background: ${spanBgColor.value}; color: ${spanColor.value}; padding: ${spanPadding.value}px; font-size: ${spanFontSize.value}px; font-family: ${fontFamily.value}; line-height: ${lineHeight.value}; }
       b { color: ${bColor.value}; font-family: ${fontFamily.value}; line-height: ${lineHeight.value}; }
       span, b { font-family: ${fontFamily.value}; line-height: ${lineHeight.value}; }
-      .gap { padding: ${gapPadding.value}px; align-items: ${gapAlign.value}; }
+      .gap { padding: ${gapPadding.value}px; align-items: ${gapAlign.value}; display: flex; }
+      hr { display: none !important; }
     </style>
   `;
-
-  previewFrame.srcdoc = style + html;
+  previewFrame.srcdoc = "<!DOCTYPE html><html><head>" + style + "</head><body>" + htmlContent + "</body></html>";
 }
 
 // ----------------------------
-// 뷰티파이 버튼
+// 뷰티파이
 // ----------------------------
 beautifyBtn.addEventListener("click", () => {
-  editor.value = beautifyHTML(editor.value);
+  htmlContent = beautifyHTML(htmlContent);
+  editor.value = htmlContent;
   updatePreview();
 });
 
+function beautifyHTML(code) {
+  const tab = "  ";
+  let result = "", indent = 0;
+  code.split(/>\s*</).forEach((element) => {
+    if (element.match(/^\/\w/)) indent--;
+    result += tab.repeat(indent) + "<" + element + ">\n";
+    if (element.match(/^<?\w[^>]*[^\/]$/) && !element.startsWith("!")) indent++;
+  });
+  // <hr> 제거
+  result = result.replace(/<hr[^>]*>/gi, '');
+  return result.trim();
+}
+
 // ----------------------------
-// 수정본 다운로드
+// 다운로드
 // ----------------------------
 downloadBtn.addEventListener("click", () => {
   const blob = new Blob([editor.value], { type: "text/html" });
   const url = URL.createObjectURL(blob);
-
   const a = document.createElement("a");
   a.href = url;
   a.download = "modified.html";
-  document.body.appendChild(a);
   a.click();
-  document.body.removeChild(a);
   URL.revokeObjectURL(url);
 });
