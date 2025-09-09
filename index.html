@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <title>TRPG 로그 뷰티파이어</title>
-  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <h1>TRPG 로그 뷰티파이어</h1>
@@ -35,13 +34,12 @@
     <label>.msg_container 배경색: <input type="color" id="msgBg" value="#00000033"></label>
     <label>p margin(px): <input type="number" id="pMargin" value="4"></label>
     <label>p padding-left(px): <input type="number" id="pPaddingLeft" value="8"></label>
-    
   </div>
 
   <h2>렌더링 미리보기</h2>
-  <iframe id="previewFrame"></iframe>
+  <iframe id="previewFrame" style="width:100%; height:500px;"></iframe>
 
-  <textarea id="editor" placeholder="HTML 코드 편집용"></textarea>
+  <textarea id="editor" placeholder="HTML 코드 편집용" style="width:100%; height:200px;"></textarea>
 
   <script src="js/main.js"></script>
 </body>
