@@ -56,57 +56,52 @@ document.addEventListener("DOMContentLoaded", function () {
   // 우리 스타일 생성 (문서 끝에 삽입)
   // ----------------------------
   function buildStyle() {
-    const fs = `${spanFontSize.value}px`;
-    const lh = `${lineHeight.value}`;
-    return `
-      <style>
-        .ccfolia_wrap { background-color: ${wrapBg.value}; }
-        .msg_container { background: ${msgBg.value}; }
+  const fs = `${spanFontSize.value}px`;
+  const lh = `${lineHeight.value}`;
+  return `
+    <style>
+      .ccfolia_wrap { background-color: ${wrapBg.value}; }
+      .msg_container { background: ${msgBg.value}; }
 
-        /* span 배경색은 wrapBg와 연동 */
-        span {
-          background: ${wrapBg.value};
-          color: ${spanColor.value};
-          padding: ${spanPadding.value}px;
-          font-size: ${fs};
-          font-family: ${fontFamily.value};
-          line-height: ${lh};
-        }
+      /* span 배경색은 wrapBg와 연동 → wrapBg.value 직접 참조 */
+      span {
+        background: ${wrapBg.value};
+        color: ${spanColor.value};
+        padding: ${spanPadding.value}px;
+        font-size: ${fs};
+        font-family: ${fontFamily.value};
+        line-height: ${lh};
+      }
 
-        /* b는 색상 옵션 제거, 폰트 크기/패밀리/줄간격만 통합 */
-        b {
-          font-size: ${fs};
-          font-family: ${fontFamily.value};
-          line-height: ${lh};
-        }
+      b {
+        font-size: ${fs};
+        font-family: ${fontFamily.value};
+        line-height: ${lh};
+      }
 
-        /* 중복 선언 최소화 */
-        span, b {
-          font-family: ${fontFamily.value};
-          line-height: ${lh};
-        }
+      span, b {
+        font-family: ${fontFamily.value};
+        line-height: ${lh};
+      }
 
-        .gap {
-          padding: ${gapPadding.value}px;
-          align-items: ${gapAlign.value};
-          display: flex;
-        }
+      .gap {
+        padding: ${gapPadding.value}px;
+        align-items: ${gapAlign.value};
+        display: flex;
+      }
 
-        hr { display: none; }
-      </style>
-    `;
-  }
+      hr { display: none; }
+    </style>
+  `;
+}
+
 
   // ----------------------------
   // 실시간 미리보기 (교체 방식 + 스타일 끝에 삽입)
   // ----------------------------
   function updatePreview() {
     // span 배경색 입력은 wrapBg에 연동 + 비활성화
-    if (spanBgColor) {
-      spanBgColor.value = wrapBg.value;
-      spanBgColor.setAttribute("disabled", "disabled");
-      spanBgColor.title = "span 배경색은 .ccfolia_wrap 배경색과 연동됩니다.";
-    }
+  
 
     const sanitized = stripConflictingStyles(editor.value);
     const style = buildStyle();
