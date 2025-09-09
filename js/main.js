@@ -82,6 +82,8 @@ function buildStyle() {
         line-height: ${lh};
       }
       b {
+        color: ${spanColor.value};
+        padding: ${spanPadding.value}px;
         font-size: ${fs};
         font-family: ${fontFamily.value};
         line-height: ${lh};
@@ -96,7 +98,7 @@ function buildStyle() {
   `;
 }
 
-// 옵션 변경 시 → preview + editor 같이 갱신
+// 옵션 변경/편집 반영
 function updatePreview(syncEditor = false) {
   const sanitized = stripConflictingStyles(editor.value);
   const style = buildStyle();
@@ -112,8 +114,10 @@ ${style}
 
   previewFrame.srcdoc = html;
 
-  // 옵션 변경 시 editor도 반영
-  if (syncEditor) editor.value = sanitized;
+  // 옵션 변경 시 editor에도 style 포함해서 반영
+  if (syncEditor) {
+    editor.value = `${sanitized}\n${style}`;
+  }
 }
 
 // 이벤트 연결
@@ -127,6 +131,7 @@ editor.addEventListener("input", () => updatePreview(false));
 
 // 동기화 버튼 → 강제 반영
 document.getElementById("syncBtn").addEventListener("click", () => updatePreview(true));
+
 
   [spanColor, spanPadding, spanFontSize, fontFamily, lineHeight, gapPadding, gapAlign, msgBg]
   .forEach((el) => el && el.addEventListener("input", updatePreview));
