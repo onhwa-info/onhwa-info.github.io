@@ -37,7 +37,7 @@ document.addEventListener("DOMContentLoaded", function() {
   });
 
   // ----------------------------
-  // 스타일 빌드 (span 중복 적용, 기존 스타일 유지)
+  // 스타일 빌드 (span 중복 적용)
   // ----------------------------
   function buildStyle() {
     return `
@@ -58,7 +58,7 @@ document.addEventListener("DOMContentLoaded", function() {
   }
 
   // ----------------------------
-  // 미리보기 업데이트 (contentDocument 사용)
+  // 미리보기 업데이트
   // ----------------------------
   function updatePreview() {
     const iframeDoc = previewFrame.contentDocument || previewFrame.contentWindow.document;
