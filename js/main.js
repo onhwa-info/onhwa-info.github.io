@@ -37,15 +37,6 @@ document.addEventListener("DOMContentLoaded", function() {
   });
 
   // ----------------------------
-  // 기존 스타일 제거
-  // ----------------------------
-  function sanitizeHTML(html) {
-    html = html.replace(/<style[\s\S]*?<\/style>/gi, "");
-    html = html.replace(/<link[^>]*rel=["']?stylesheet["']?[^>]*>/gi, "");
-    // span 삭제는 하지 않고 기존 스타일 유지
-    html = html.replace(/(<(b|p|div|hr)\b[^>]*?)\s*style="[^"]*"/gi, "$1");
-    return html;
-  }
 
   // ----------------------------
   // 스타일 빌드 (span 중복 적용)
