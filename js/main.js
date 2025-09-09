@@ -39,19 +39,47 @@ document.addEventListener("DOMContentLoaded", function() {
   // 실시간 미리보기
   // ----------------------------
   function updatePreview() {
-    const style = `
-      <style>
-        .ccfolia_wrap { background-color: ${wrapBg.value}; }
-        .msg_container { background: ${msgBg.value}; }
-        span { background: ${spanBgColor.value}; color: ${spanColor.value}; padding: ${spanPadding.value}px; font-size: ${spanFontSize.value}px; font-family: ${fontFamily.value}; line-height: ${lineHeight.value}; }
-        b { color: ${bColor.value}; font-family: ${fontFamily.value}; line-height: ${lineHeight.value}; }
-        span, b { font-family: ${fontFamily.value}; line-height: ${lineHeight.value}; }
-        .gap { padding: ${gapPadding.value}px; align-items: ${gapAlign.value}; display: flex; }
-        hr { display: none !important; }
-      </style>
-    `;
-    previewFrame.srcdoc = "<!DOCTYPE html><html><head>" + style + "</head><body>" + editor.value + "</body></html>";
-  }
+  const style = `
+    <style>
+      /* 배경색 연동 */
+      .ccfolia_wrap { background-color: ${wrapBg.value} !important; }
+      .msg_container { background: ${msgBg.value} !important; }
+
+      /* span: 배경은 wrapBg와 동일하게, 글자색은 spanColor, 글꼴 크기는 통합 */
+      span {
+        background: ${wrapBg.value} !important;
+        color: ${spanColor.value} !important;
+        padding: ${spanPadding.value}px !important;
+        font-size: ${spanFontSize.value}px !important;
+        font-family: ${fontFamily.value} !important;
+        line-height: ${lineHeight.value} !important;
+      }
+
+      /* b: 글꼴 크기를 span과 통합 */
+      b {
+        font-size: ${spanFontSize.value}px !important;
+        font-family: ${fontFamily.value} !important;
+        line-height: ${lineHeight.value} !important;
+      }
+
+      /* 공통 적용 */
+      span, b {
+        font-family: ${fontFamily.value} !important;
+        line-height: ${lineHeight.value} !important;
+      }
+
+      .gap {
+        padding: ${gapPadding.value}px !important;
+        align-items: ${gapAlign.value} !important;
+        display: flex !important;
+      }
+
+      hr { display: none !important; }
+    </style>
+  `;
+  previewFrame.srcdoc = "<!DOCTYPE html><html><head>" + style + "</head><body>" + editor.value + "</body></html>";
+}
+
 
   editor.addEventListener("input", () => {
     htmlContent = editor.value;
