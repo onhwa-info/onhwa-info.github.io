@@ -105,20 +105,24 @@ document.addEventListener("DOMContentLoaded", function () {
   // ----------------------------
   // 미리보기 갱신
   // ----------------------------
-  function updatePreview(syncEditor = false) {
-    const sanitized = stripStyles(editor.value);
-    const style = buildStyle();
+  function updatePreview() {
+  const sanitized = stripStyles(editor.value);
+  const style = buildStyle();
 
-    const html = `<!DOCTYPE html>
+  const html = `<!DOCTYPE html>
 <html>
-<head><meta charset="UTF-8"></head>
+<head>
+<meta charset="UTF-8">
+${style}
+</head>
 <body>
 ${sanitized}
-${style}
 </body>
 </html>`;
 
-    previewFrame.srcdoc = html;
+  previewFrame.srcdoc = html;
+}
+
 
     if (syncEditor) {
       editor.value = `${sanitized}\n${style}`;
