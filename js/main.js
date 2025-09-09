@@ -55,16 +55,26 @@ document.addEventListener("DOMContentLoaded", function () {
   // ----------------------------
   // 우리 스타일 생성 (문서 끝에 삽입)
   // ----------------------------
-  function buildStyle() {
-  console.log("wrapBg 현재 값:", wrapBg.value);  // 디버깅용
+  function hexToRgba(hex, alpha) {
+  const bigint = parseInt(hex.slice(1), 16);
+  const r = (bigint >> 16) & 255;
+  const g = (bigint >> 8) & 255;
+  const b = bigint & 255;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+function buildStyle() {
+  const wrapColor = hexToRgba(wrapBg.value, wrapAlpha.value);
+  const msgColor  = hexToRgba(msgBg.value, msgAlpha.value);
   const fs = `${spanFontSize.value}px`;
   const lh = `${lineHeight.value}`;
+
   return `
     <style>
-      .ccfolia_wrap { background-color: ${wrapBg.value}; }
-      .msg_container { background: ${msgBg.value}; }
+      .ccfolia_wrap { background-color: ${wrapColor}; }
+      .msg_container { background: ${msgColor}; }
       span {
-        background: ${wrapBg.value};
+        background: ${wrapColor};
         color: ${spanColor.value};
         padding: ${spanPadding.value}px;
         font-size: ${fs};
@@ -86,20 +96,12 @@ document.addEventListener("DOMContentLoaded", function () {
   `;
 }
 
+// 옵션 변경 시 → preview + editor 같이 갱신
+function updatePreview(syncEditor = false) {
+  const sanitized = stripConflictingStyles(editor.value);
+  const style = buildStyle();
 
-
-  // ----------------------------
-  // 실시간 미리보기 (교체 방식 + 스타일 끝에 삽입)
-  // ----------------------------
-  function updatePreview() {
-    // span 배경색 입력은 wrapBg에 연동 + 비활성화
-  
-
-    const sanitized = stripConflictingStyles(editor.value);
-    const style = buildStyle();
-
-    // 중요: 우리 스타일을 body 맨 끝에 넣어 '마지막 규칙 승리' 보장
-    const html = `<!DOCTYPE html>
+  const html = `<!DOCTYPE html>
 <html>
 <head><meta charset="UTF-8"></head>
 <body>
@@ -108,13 +110,23 @@ ${style}
 </body>
 </html>`;
 
-    previewFrame.srcdoc = html;
-  }
+  previewFrame.srcdoc = html;
 
-  editor.addEventListener("input", () => {
-    htmlContent = editor.value;
-    updatePreview();
-  });
+  // 옵션 변경 시 editor도 반영
+  if (syncEditor) editor.value = sanitized;
+}
+
+// 이벤트 연결
+[
+  spanColor, spanPadding, spanFontSize, fontFamily, lineHeight, 
+  gapPadding, gapAlign, wrapBg, wrapAlpha, msgBg, msgAlpha
+].forEach(el => el && el.addEventListener("input", () => updatePreview(true)));
+
+// editor 수정 시 preview만 갱신
+editor.addEventListener("input", () => updatePreview(false));
+
+// 동기화 버튼 → 강제 반영
+document.getElementById("syncBtn").addEventListener("click", () => updatePreview(true));
 
   [spanColor, spanPadding, spanFontSize, fontFamily, lineHeight, gapPadding, gapAlign, msgBg]
   .forEach((el) => el && el.addEventListener("input", updatePreview));
