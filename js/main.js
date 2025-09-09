@@ -42,12 +42,13 @@ document.addEventListener("DOMContentLoaded", function() {
   function sanitizeHTML(html) {
     html = html.replace(/<style[\s\S]*?<\/style>/gi, "");
     html = html.replace(/<link[^>]*rel=["']?stylesheet["']?[^>]*>/gi, "");
-    html = html.replace(/(<(span|b|p|div|hr)\b[^>]*?)\s*style="[^"]*"/gi, "$1");
+    // span 삭제는 하지 않고 기존 스타일 유지
+    html = html.replace(/(<(b|p|div|hr)\b[^>]*?)\s*style="[^"]*"/gi, "$1");
     return html;
   }
 
   // ----------------------------
-  // 스타일 빌드
+  // 스타일 빌드 (span 중복 적용)
   // ----------------------------
   function buildStyle() {
     return `
@@ -55,9 +56,10 @@ document.addEventListener("DOMContentLoaded", function() {
         .ccfolia_wrap { background-color: ${wrapBg.value}; padding: 10px; }
         .msg_container { background: ${msgBg.value}; width: 40px; height: 40px; flex-shrink: 0; border-radius: 5px; display: flex; align-items: center; justify-content: center; }
         .msg_container img { width: 40px; height: 40px; object-fit: cover; border-radius: 5px; }
-        span { background: ${wrapBg.value}; color: ${spanColor.value}; padding: ${spanPadding.value}px; }
-        span, b { font-size: ${spanFontSize.value}px; font-family: ${fontFamily.value}; line-height: ${lineHeight.value}; }
-        b { color: ${bColor.value}; font-weight: bold; }
+        /* span 기존 스타일은 유지하고 중복 적용 */
+        span { background: ${wrapBg.value}; color: ${spanColor.value}; padding: ${spanPadding.value}px !important; }
+        span, b { font-size: ${spanFontSize.value}px !important; font-family: ${fontFamily.value} !important; line-height: ${lineHeight.value} !important; }
+        b { color: ${bColor.value} !important; font-weight: bold; }
         .gap { padding: ${gapPadding.value}px; align-items: ${gapAlign.value}; display: flex; gap: 10px; }
         .gap p { margin: ${pMargin.value}px 0; padding-left: ${pPaddingLeft.value}px; }
         hr { display: none !important; }
