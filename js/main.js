@@ -43,9 +43,9 @@ document.addEventListener("DOMContentLoaded", function() {
       <style>
         .ccfolia_wrap { background-color: ${wrapBg.value}; }
         .msg_container { background: ${msgBg.value}; }
-        span { background: ${spanBgColor.value}; color: ${spanColor.value}; padding: ${spanPadding.value}px; font-family: ${fontFamily.value}; line-height: ${lineHeight.value}; }
+        span { background: ${spanBgColor.value}; color: ${spanColor.value}; padding: ${spanPadding.value}px; font-size: ${spanFontSize.value}px; font-family: ${fontFamily.value}; line-height: ${lineHeight.value}; }
         b { color: ${bColor.value}; font-family: ${fontFamily.value}; line-height: ${lineHeight.value}; }
-        span, b {font-size: ${spanFontSize.value}px; font-family: ${fontFamily.value}; line-height: ${lineHeight.value}; }
+        span, b { font-family: ${fontFamily.value}; line-height: ${lineHeight.value}; }
         .gap { padding: ${gapPadding.value}px; align-items: ${gapAlign.value}; display: flex; }
         hr { display: none !important; }
       </style>
