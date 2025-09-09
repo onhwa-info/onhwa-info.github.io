@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", function() {
-  // 요소 선택
   const fileInput = document.getElementById("fileInput");
   const editor = document.getElementById("editor");
   const previewFrame = document.getElementById("previewFrame");
@@ -22,9 +21,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
   let htmlContent = "";
 
-  // ----------------------------
   // HTML 파일 읽기
-  // ----------------------------
   fileInput.addEventListener("change", (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -37,9 +34,15 @@ document.addEventListener("DOMContentLoaded", function() {
     reader.readAsText(file);
   });
 
-  // ----------------------------
-  // 스타일 생성
-  // ----------------------------
+  // 기존 스타일 제거 + inline style 제거
+  function sanitizeHTML(html) {
+    html = html.replace(/<style[\s\S]*?<\/style>/gi, "");
+    html = html.replace(/<link[^>]*rel=["']?stylesheet["']?[^>]*>/gi, "");
+    html = html.replace(/\s*style="[^"]*"/gi, "");
+    return html;
+  }
+
+  // 스타일 빌드
   function buildStyle() {
     return `
       <style>
@@ -63,27 +66,17 @@ document.addEventListener("DOMContentLoaded", function() {
         }
         .gap p {
           margin: ${pMargin.value}px 0;
-            padding-left: ${pPaddingLeft.value}px; /* 옵션화된 값 */
+          padding-left: ${pPaddingLeft.value}px;
         }
         hr { display: none !important; }
       </style>
     `;
   }
 
-  // ----------------------------
   // 미리보기 업데이트
-  // ----------------------------
-  function stripStyles(html) {
-    html = html.replace(/<style[\s\S]*?<\/style>/gi, "");
-    html = html.replace(/<link[^>]*rel=["']?stylesheet["']?[^>]*>/gi, "");
-    html = html.replace(/\s*style="[^"]*"/gi, "");
-    return html;
-  }
-
   function updatePreview() {
-    const sanitized = stripStyles(editor.value);
+    const sanitized = sanitizeHTML(editor.value);
     const style = buildStyle();
-
     const html = `<!DOCTYPE html>
 <html>
 <head>
@@ -94,25 +87,17 @@ ${style}
 ${sanitized}
 </body>
 </html>`;
-
     previewFrame.srcdoc = html;
   }
 
-  editor.addEventListener("input", () => {
-    htmlContent = editor.value;
-    updatePreview();
-  });
-
+  editor.addEventListener("input", updatePreview);
   [spanBgColor, spanColor, spanPadding, spanFontSize,
- bColor, fontFamily, lineHeight, gapPadding, gapAlign, wrapBg, msgBg, pMargin, pPaddingLeft
-].forEach(el => el.addEventListener("input", updatePreview));
+   bColor, fontFamily, lineHeight, gapPadding, gapAlign, wrapBg, msgBg, pMargin, pPaddingLeft
+  ].forEach(el => el.addEventListener("input", updatePreview));
 
-  // ----------------------------
   // 뷰티파이
-  // ----------------------------
   beautifyBtn.addEventListener("click", () => {
-    htmlContent = beautifyHTML(editor.value);
-    editor.value = htmlContent;
+    editor.value = beautifyHTML(editor.value);
     updatePreview();
   });
 
@@ -124,15 +109,18 @@ ${sanitized}
       result += tab.repeat(indent) + "<" + element + ">\n";
       if (element.match(/^<?\w[^>]*[^\/]$/) && !element.startsWith("!")) indent++;
     });
-    result = result.replace(/<hr[^>]*>/gi, '');
-    return result.trim();
+    return result.replace(/<hr[^>]*>/gi, '').trim();
   }
 
-  // ----------------------------
   // 다운로드
-  // ----------------------------
   downloadBtn.addEventListener("click", () => {
-    const blob = new Blob([editor.value], { type: "text/html" });
+    const sanitized = sanitizeHTML(editor.value);
+    const out = `<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8">${buildStyle()}</head>
+<body>${sanitized}</body>
+</html>`;
+    const blob = new Blob([out], { type: "text/html" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -140,4 +128,7 @@ ${sanitized}
     a.click();
     URL.revokeObjectURL(url);
   });
+
+  // 초기 렌더
+  updatePreview();
 });
