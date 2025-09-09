@@ -37,20 +37,34 @@ document.addEventListener("DOMContentLoaded", function() {
   });
 
   // ----------------------------
-
-  // ----------------------------
-  // 스타일 빌드 (span 중복 적용)
+  // 스타일 빌드 (span 기존 스타일 유지, 중복 적용)
   // ----------------------------
   function buildStyle() {
     return `
       <style>
         .ccfolia_wrap { background-color: ${wrapBg.value}; padding: 10px; }
-        .msg_container { background: ${msgBg.value}; width: 40px; height: 40px; flex-shrink: 0; border-radius: 5px; display: flex; align-items: center; justify-content: center; }
+        .msg_container { 
+          background: ${msgBg.value}; 
+          width: 40px; height: 40px; 
+          flex-shrink: 0; border-radius: 5px; 
+          display: flex; align-items: center; justify-content: center; 
+        }
         .msg_container img { width: 40px; height: 40px; object-fit: cover; border-radius: 5px; }
-        /* span 기존 스타일은 유지하고 중복 적용 */
-        span { background: ${wrapBg.value}; color: ${spanColor.value}; padding: ${spanPadding.value}px !important; }
-        span, b { font-size: ${spanFontSize.value}px !important; font-family: ${fontFamily.value} !important; line-height: ${lineHeight.value} !important; }
-        b { color: ${bColor.value} !important; font-weight: bold; }
+        /* span 기존 스타일 유지, 덮어씌우기 */
+        span { 
+          background: ${wrapBg.value} !important; 
+          color: ${spanColor.value} !important; 
+          padding: ${spanPadding.value}px !important; 
+        }
+        span, b { 
+          font-size: ${spanFontSize.value}px !important; 
+          font-family: ${fontFamily.value} !important; 
+          line-height: ${lineHeight.value} !important; 
+        }
+        b { 
+          color: ${bColor.value} !important; 
+          font-weight: bold; 
+        }
         .gap { padding: ${gapPadding.value}px; align-items: ${gapAlign.value}; display: flex; gap: 10px; }
         .gap p { margin: ${pMargin.value}px 0; padding-left: ${pPaddingLeft.value}px; }
         hr { display: none !important; }
@@ -61,10 +75,11 @@ document.addEventListener("DOMContentLoaded", function() {
   // 미리보기 업데이트
   // ----------------------------
   function updatePreview() {
-    const sanitized = sanitizeHTML(editor.value);
     const html = `<!DOCTYPE html>
-<html><head><meta charset="UTF-8">${buildStyle()}</head>
-<body>${sanitized}</body></html>`;
+<html>
+<head><meta charset="UTF-8">${buildStyle()}</head>
+<body>${editor.value}</body>
+</html>`;
     previewFrame.srcdoc = html;
   }
 
@@ -83,7 +98,7 @@ document.addEventListener("DOMContentLoaded", function() {
   // 다운로드
   // ----------------------------
   downloadBtn.addEventListener("click", () => {
-    const out = `<!DOCTYPE html><html><head><meta charset="UTF-8">${buildStyle()}</head><body>${sanitizeHTML(editor.value)}</body></html>`;
+    const out = `<!DOCTYPE html><html><head><meta charset="UTF-8">${buildStyle()}</head><body>${editor.value}</body></html>`;
     const blob = new Blob([out], { type: "text/html" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
