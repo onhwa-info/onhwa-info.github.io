@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
   // 요소 선택
   const fileInput = document.getElementById("fileInput");
   const editor = document.getElementById("editor");
@@ -6,11 +6,10 @@ document.addEventListener("DOMContentLoaded", function() {
   const beautifyBtn = document.getElementById("beautifyBtn");
   const downloadBtn = document.getElementById("downloadBtn");
 
-  const spanBgColor = document.getElementById("spanBgColor");
+  const spanBgColor = document.getElementById("spanBgColor"); // UI는 남기되 wrapBg와 연동/비활성화
   const spanColor = document.getElementById("spanColor");
   const spanPadding = document.getElementById("spanPadding");
-  const spanFontSize = document.getElementById("spanFontSize");
-  const bColor = document.getElementById("bColor");
+  const spanFontSize = document.getElementById("spanFontSize"); // span, b 공통 폰트 크기
   const fontFamily = document.getElementById("fontFamily");
   const lineHeight = document.getElementById("lineHeight");
   const gapPadding = document.getElementById("gapPadding");
@@ -36,62 +35,105 @@ document.addEventListener("DOMContentLoaded", function() {
   });
 
   // ----------------------------
-  // 실시간 미리보기
+  // 기존 스타일 제거(교체) 유틸
+  // ----------------------------
+  function stripConflictingStyles(html) {
+    // 1) 문서 내 스타일/외부 CSS 제거
+    html = html.replace(/<style[\s\S]*?<\/style>/gi, "");
+    html = html.replace(/<link[^>]*rel=["']?stylesheet["']?[^>]*>/gi, "");
+
+    // 2) 우리가 관리하는 요소들의 인라인 style 제거 (교체 개념)
+    html = html.replace(/(<span\b[^>]*?)\s*style="[^"]*"/gi, "$1");
+    html = html.replace(/(<b\b[^>]*?)\s*style="[^"]*"/gi, "$1");
+    html = html.replace(/(<[^>]*class="[^"]*\bgap\b[^"]*"[^>]*?)\s*style="[^"]*"/gi, "$1");
+    html = html.replace(/(<[^>]*class="[^"]*\bccfolia_wrap\b[^"]*"[^>]*?)\s*style="[^"]*"/gi, "$1");
+    html = html.replace(/(<[^>]*class="[^"]*\bmsg_container\b[^"]*"[^>]*?)\s*style="[^"]*"/gi, "$1");
+
+    return html;
+  }
+
+  // ----------------------------
+  // 우리 스타일 생성 (문서 끝에 삽입)
+  // ----------------------------
+  function buildStyle() {
+    const fs = `${spanFontSize.value}px`;
+    const lh = `${lineHeight.value}`;
+    return `
+      <style>
+        .ccfolia_wrap { background-color: ${wrapBg.value}; }
+        .msg_container { background: ${msgBg.value}; }
+
+        /* span 배경색은 wrapBg와 연동 */
+        span {
+          background: ${wrapBg.value};
+          color: ${spanColor.value};
+          padding: ${spanPadding.value}px;
+          font-size: ${fs};
+          font-family: ${fontFamily.value};
+          line-height: ${lh};
+        }
+
+        /* b는 색상 옵션 제거, 폰트 크기/패밀리/줄간격만 통합 */
+        b {
+          font-size: ${fs};
+          font-family: ${fontFamily.value};
+          line-height: ${lh};
+        }
+
+        /* 중복 선언 최소화 */
+        span, b {
+          font-family: ${fontFamily.value};
+          line-height: ${lh};
+        }
+
+        .gap {
+          padding: ${gapPadding.value}px;
+          align-items: ${gapAlign.value};
+          display: flex;
+        }
+
+        hr { display: none; }
+      </style>
+    `;
+  }
+
+  // ----------------------------
+  // 실시간 미리보기 (교체 방식 + 스타일 끝에 삽입)
   // ----------------------------
   function updatePreview() {
-  const style = `
-    <style>
-      /* 배경색 연동 */
-      .ccfolia_wrap { background-color: ${wrapBg.value} !important; }
-      .msg_container { background: ${msgBg.value} !important; }
+    // span 배경색 입력은 wrapBg에 연동 + 비활성화
+    if (spanBgColor) {
+      spanBgColor.value = wrapBg.value;
+      spanBgColor.setAttribute("disabled", "disabled");
+      spanBgColor.title = "span 배경색은 .ccfolia_wrap 배경색과 연동됩니다.";
+    }
 
-      /* span: 배경은 wrapBg와 동일하게, 글자색은 spanColor, 글꼴 크기는 통합 */
-      span {
-        background: ${wrapBg.value} !important;
-        color: ${spanColor.value} !important;
-        padding: ${spanPadding.value}px !important;
-        font-size: ${spanFontSize.value}px !important;
-        font-family: ${fontFamily.value} !important;
-        line-height: ${lineHeight.value} !important;
-      }
+    const sanitized = stripConflictingStyles(editor.value);
+    const style = buildStyle();
 
-      /* b: 글꼴 크기를 span과 통합 */
-      b {
-        font-size: ${spanFontSize.value}px !important;
-        font-family: ${fontFamily.value} !important;
-        line-height: ${lineHeight.value} !important;
-      }
+    // 중요: 우리 스타일을 body 맨 끝에 넣어 '마지막 규칙 승리' 보장
+    const html = `<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"></head>
+<body>
+${sanitized}
+${style}
+</body>
+</html>`;
 
-      /* 공통 적용 */
-      span, b {
-        font-family: ${fontFamily.value} !important;
-        line-height: ${lineHeight.value} !important;
-      }
-
-      .gap {
-        padding: ${gapPadding.value}px !important;
-        align-items: ${gapAlign.value} !important;
-        display: flex !important;
-      }
-
-      hr { display: none !important; }
-    </style>
-  `;
-  previewFrame.srcdoc = "<!DOCTYPE html><html><head>" + style + "</head><body>" + editor.value + "</body></html>";
-}
-
+    previewFrame.srcdoc = html;
+  }
 
   editor.addEventListener("input", () => {
     htmlContent = editor.value;
     updatePreview();
   });
 
-  [spanBgColor, spanColor, spanPadding, spanFontSize,
-   bColor, fontFamily, lineHeight, gapPadding, gapAlign, wrapBg, msgBg
-  ].forEach(el => el.addEventListener("input", updatePreview));
+  [spanBgColor, spanColor, spanPadding, spanFontSize, fontFamily, lineHeight, gapPadding, gapAlign, wrapBg, msgBg]
+    .forEach((el) => el && el.addEventListener("input", updatePreview));
 
   // ----------------------------
-  // 뷰티파이
+  // 뷰티파이 (기존과 동일, <hr> 제거)
   // ----------------------------
   beautifyBtn.addEventListener("click", () => {
     htmlContent = beautifyHTML(editor.value);
@@ -107,15 +149,24 @@ document.addEventListener("DOMContentLoaded", function() {
       result += tab.repeat(indent) + "<" + element + ">\n";
       if (element.match(/^<?\w[^>]*[^\/]$/) && !element.startsWith("!")) indent++;
     });
-    result = result.replace(/<hr[^>]*>/gi, '');
+    result = result.replace(/<hr[^>]*>/gi, "");
     return result.trim();
   }
 
   // ----------------------------
-  // 다운로드
+  // 다운로드: 미리보기와 동일하게 '교체된 결과'를 저장
   // ----------------------------
   downloadBtn.addEventListener("click", () => {
-    const blob = new Blob([editor.value], { type: "text/html" });
+    const sanitized = stripConflictingStyles(editor.value);
+    const out = `<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"></head>
+<body>
+${sanitized}
+${buildStyle()}
+</body>
+</html>`;
+    const blob = new Blob([out], { type: "text/html" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -123,4 +174,7 @@ document.addEventListener("DOMContentLoaded", function() {
     a.click();
     URL.revokeObjectURL(url);
   });
+
+  // 초기 렌더
+  updatePreview();
 });
