@@ -2,41 +2,22 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>TRPG 로그 뷰티파이어</title>
+  <title>로그 뷰어 & 뷰티파이어</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div id="controls">
-    <h2>TRPG 로그 뷰티파이어</h2>
-    <input type="file" id="fileInput" accept=".html">
-    <button onclick="removeHR()">모든 HR 삭제</button>
-    
-    <label>판정 span 배경색</label>
-    <input type="color" id="spanBg" value="#000000">
-    <label>판정 span 패딩(px)</label>
-    <input type="number" id="spanPadding" value="5">
+  <h1>로그 뷰어 & 뷰티파이어</h1>
+  
+  <input type="file" id="fileInput" accept=".log,.txt">
+  <button id="clearBtn">지우기</button>
+  <button id="beautifyBtn">뷰티파이</button>
 
-    <label>글꼴 크기(px)</label>
-    <input type="number" id="fontSize" value="16">
-    <label>글꼴 종류</label>
-    <input type="text" id="fontFamily" value="Arial, sans-serif">
-    <label>줄간격</label>
-    <input type="number" step="0.1" id="lineHeight" value="1.5">
-
-    <label>.gap padding(px)</label>
-    <input type="number" id="gapPadding" value="16">
-
-    <label>b 태그 색상</label>
-    <input type="color" id="bColor" value="#808080">
-
-    <label>.ccfolia_wrap 배경색</label>
-    <input type="color" id="wrapBg" value="#2c2c2c">
-
-    <button onclick="applyChanges()">적용하기</button>
+  <div id="editorContainer">
+    <textarea id="editor" placeholder="업로드한 로그가 여기 표시됩니다"></textarea>
   </div>
 
-  <!-- 미리보기 창 -->
-  <iframe id="preview"></iframe>
+  <h2>미리보기</h2>
+  <div id="preview"></div>
 
   <script src="script.js"></script>
 </body>
