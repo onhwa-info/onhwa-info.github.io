@@ -1,0 +1,6 @@
+body { display: flex; gap: 20px; font-family: sans-serif; margin: 0; }
+#controls { width: 300px; padding: 15px; background: #f5f5f5; border-right: 1px solid #ddd; height: 100vh; overflow-y: auto; }
+iframe { flex: 1; height: 100vh; border: none; }
+label { display: block; margin: 10px 0 5px; font-weight: bold; }
+input, button { width: 100%; margin-bottom: 10px; padding: 6px; }
+button { cursor: pointer; }
