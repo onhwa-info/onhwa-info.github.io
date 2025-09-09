@@ -1,72 +1,101 @@
 const fileInput = document.getElementById("fileInput");
 const editor = document.getElementById("editor");
-const preview = document.getElementById("preview");
-const clearBtn = document.getElementById("clearBtn");
-const beautifyBtn = document.getElementById("beautifyBtn");
+const previewFrame = document.getElementById("previewFrame");
 
-// 파일 업로드 → textarea에 넣기
-fileInput.addEventListener("change", (event) => {
-  const file = event.target.files[0];
-  if (!file) return;
+// 옵션 요소들
+const fontSize = document.getElementById("fontSize");
+const fontFamily = document.getElementById("fontFamily");
+const lineHeight = document.getElementById("lineHeight");
+const bColor = document.getElementById("bColor");
+const gapPadding = document.getElementById("gapPadding");
+const wrapBg = document.getElementById("wrapBg");
+const buttonBg = document.getElementById("buttonBg");
+const buttonPadding = document.getElementById("buttonPadding");
+const removeHrBtn = document.getElementById("removeHr");
 
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    editor.value = e.target.result;
-    updatePreview();
-  };
-  reader.readAsText(file);
+let originalHtml = "";
+
+// 파일 업로드 → 코드 로드
+fileInput.addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      originalHtml = ev.target.result;
+      editor.value = originalHtml;
+      updatePreview();
+    };
+    reader.readAsText(file, "UTF-8");
+  }
 });
 
-// textarea 수정 시 → 미리보기 갱신
+// 에디터 변경 시 미리보기 업데이트
 editor.addEventListener("input", updatePreview);
 
-// 미리보기 갱신
-function updatePreview() {
-  const rawText = editor.value;
+// 옵션 변경 시 적용
+[fontSize, fontFamily, lineHeight, bColor, gapPadding, wrapBg, buttonBg, buttonPadding].forEach(input => {
+  input.addEventListener("input", applyBeautify);
+});
 
-  // 로그 강조 규칙 (예시)
-  const formatted = rawText
-    .replace(/\[ERROR\]/g, '<span style="color:red; font-weight:bold;">[ERROR]</span>')
-    .replace(/\[WARN\]/g, '<span style="color:orange; font-weight:bold;">[WARN]</span>')
-    .replace(/\[INFO\]/g, '<span style="color:blue;">[INFO]</span>');
-
-  preview.innerHTML = formatted;
-}
-
-// 뷰티파이어 (간단 버전: JSON 로그 자동 정렬 + 공백 정리)
-beautifyBtn.addEventListener("click", () => {
-  let text = editor.value;
-
-  // JSON 라인 찾기 → 예쁘게 들여쓰기
-  const beautified = text.split("\n").map(line => {
-    line = line.trim();
-
-    // JSON 라인인 경우
-    if (line.startsWith("{") && line.endsWith("}")) {
-      try {
-        const obj = JSON.parse(line);
-        return JSON.stringify(obj, null, 2); // 들여쓰기 2칸
-      } catch (e) {
-        return line; // 파싱 실패 → 그대로 둠
-      }
-    }
-
-    // 날짜 + 로그 패턴 정리 (예: "2025-09-09 12:00:00 [INFO] ..." → 잘 정렬)
-    const match = line.match(/^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}) (.*)$/);
-    if (match) {
-      return `${match[1]}    ${match[2]}`;
-    }
-
-    return line;
-  }).join("\n");
-
-  editor.value = beautified;
+// hr 삭제 버튼
+removeHrBtn.addEventListener("click", () => {
+  editor.value = editor.value.replace(/<hr[^>]*>/g, "");
   updatePreview();
 });
 
-// 지우기 버튼
-clearBtn.addEventListener("click", () => {
-  editor.value = "";
-  preview.innerHTML = "";
-  fileInput.value = "";
-});
+// Beautify 적용 함수
+function applyBeautify() {
+  let html = editor.value;
+
+  // 폰트 수정 (span, b)
+  html = html.replace(/span, b\s*{[^}]*}/, `span, b {
+    font-size: ${fontSize.value}px;
+    font-family: '${fontFamily.value}', sans-serif;
+    line-height: ${lineHeight.value};
+  }`);
+
+  // b 색상
+  html = html.replace(/b\s*{[^}]*}/, `b {
+    color: ${bColor.value};
+    font-size: 9pt;
+    font-weight: 200;
+  }`);
+
+  // gap padding & align-items
+  html = html.replace(/\.gap\s*{[^}]*}/, `.gap {
+    gap: 15px;
+    display: flex;
+    -webkit-box-pack: start;
+    justify-content: flex-start;
+    align-items: center;
+    position: relative;
+    text-decoration: none;
+    width: 100%;
+    box-sizing: border-box;
+    text-align: left;
+    padding: ${gapPadding.value};
+  }`);
+
+  // ccfolia_wrap 배경색
+  html = html.replace(/\.ccfolia_wrap\s*{[^}]*}/, `.ccfolia_wrap {
+    position: relative;
+    padding: 10px !important;
+    background-color: ${wrapBg.value};
+    color: #fefefe;
+  }`);
+
+  // 버튼 스타일(span)
+  html = html.replace(/span\s*style="[^"]*background:[^;]*;[^"]*padding:[^;]*;[^"]*"/g,
+    (match) => match
+      .replace(/background:[^;]*/g, `background: ${buttonBg.value}`)
+      .replace(/padding:[^;]*/g, `padding: ${buttonPadding.value}`)
+  );
+
+  editor.value = html;
+  updatePreview();
+}
+
+// 미리보기 업데이트
+function updatePreview() {
+  previewFrame.srcdoc = editor.value;
+}
