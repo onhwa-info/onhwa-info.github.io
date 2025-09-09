@@ -8,7 +8,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const spanColor = document.getElementById("spanColor");
   const spanPadding = document.getElementById("spanPadding");
-  const fontSize = document.getElementById("fontSize");
+  const spanFontSize = document.getElementById("spanFontSize");
+  const bColor = document.getElementById("bColor");
   const fontFamily = document.getElementById("fontFamily");
   const lineHeight = document.getElementById("lineHeight");
   const gapPadding = document.getElementById("gapPadding");
@@ -35,24 +36,17 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // ----------------------------
-  // 기존 스타일 제거(교체용)
+  // 기존 스타일 제거
   // ----------------------------
   function stripStyles(html) {
-    // <style>, <link rel="stylesheet"> 제거
+    // <style>과 <link rel="stylesheet">만 제거
     html = html.replace(/<style[\s\S]*?<\/style>/gi, "");
     html = html.replace(/<link[^>]*rel=["']?stylesheet["']?[^>]*>/gi, "");
-
-    // 특정 태그의 인라인 스타일 제거 (span 제외)
-    html = html.replace(/(<b\b[^>]*?)\s*style="[^"]*"/gi, "$1");
-    html = html.replace(/(<[^>]*class="[^"]*\bgap\b[^"]*"[^>]*?)\s*style="[^"]*"/gi, "$1");
-    html = html.replace(/(<[^>]*class="[^"]*\bccfolia_wrap\b[^"]*"[^>]*?)\s*style="[^"]*"/gi, "$1");
-    html = html.replace(/(<[^>]*class="[^"]*\bmsg_container\b[^"]*"[^>]*?)\s*style="[^"]*"/gi, "$1");
-
     return html;
   }
 
   // ----------------------------
-  // HEX → RGBA 변환
+  // HEX + 알파 → RGBA 변환
   // ----------------------------
   function hexToRgba(hex, alpha) {
     const bigint = parseInt(hex.slice(1), 16);
@@ -66,21 +60,16 @@ document.addEventListener("DOMContentLoaded", function () {
   // 스타일 생성
   // ----------------------------
   function buildStyle() {
-    const wrapColor = wrapBg.value; // 투명도 없는 wrap 배경
-    const msgColor = hexToRgba(msgBg.value, msgAlpha.value);
-    const fs = `${fontSize.value}px`;
+    const fs = `${spanFontSize.value}px`;
     const lh = `${lineHeight.value}`;
+    const msgColor = hexToRgba(msgBg.value, msgAlpha.value);
 
     return `
       <style>
-        .ccfolia_wrap {
-          background-color: ${wrapColor};
-        }
-        .msg_container {
-          background: ${msgColor};
-        }
+        .ccfolia_wrap { background-color: ${wrapBg.value}; }
+        .msg_container { background: ${msgColor}; }
         span {
-          background: ${wrapColor};
+          background: ${wrapBg.value};
           color: ${spanColor.value};
           padding: ${spanPadding.value}px;
           font-size: ${fs};
@@ -88,6 +77,7 @@ document.addEventListener("DOMContentLoaded", function () {
           line-height: ${lh};
         }
         b {
+          color: ${bColor.value};
           font-size: ${fs};
           font-family: ${fontFamily.value};
           line-height: ${lh};
@@ -103,13 +93,13 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // ----------------------------
-  // 미리보기 갱신
+  // 미리보기 업데이트
   // ----------------------------
   function updatePreview() {
-  const sanitized = stripStyles(editor.value);
-  const style = buildStyle();
+    const sanitized = stripStyles(editor.value);
+    const style = buildStyle();
 
-  const html = `<!DOCTYPE html>
+    const html = `<!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
@@ -120,25 +110,38 @@ ${sanitized}
 </body>
 </html>`;
 
-  previewFrame.srcdoc = html;
-}
-
-
-    if (syncEditor) {
-      editor.value = `${sanitized}\n${style}`;
-    }
+    previewFrame.srcdoc = html;
   }
 
   // ----------------------------
-  // 이벤트 연결
+  // 에디터 입력 → 미리보기 반영
+  // ----------------------------
+  editor.addEventListener("input", () => {
+    htmlContent = editor.value;
+    updatePreview();
+  });
+
+  // ----------------------------
+  // 옵션 변경 → 미리보기 반영
   // ----------------------------
   [
-    spanColor, spanPadding, fontSize, fontFamily, lineHeight,
-    gapPadding, gapAlign, wrapBg, msgBg, msgAlpha
-  ].forEach(el => el && el.addEventListener("input", () => updatePreview(true)));
+    spanColor,
+    spanPadding,
+    spanFontSize,
+    bColor,
+    fontFamily,
+    lineHeight,
+    gapPadding,
+    gapAlign,
+    wrapBg,
+    msgBg,
+    msgAlpha,
+  ].forEach((el) => el && el.addEventListener("input", updatePreview));
 
-  editor.addEventListener("input", () => updatePreview(false));
-  syncBtn.addEventListener("click", () => updatePreview(true));
+  // ----------------------------
+  // 수동 동기화 버튼
+  // ----------------------------
+  syncBtn.addEventListener("click", updatePreview);
 
   // ----------------------------
   // 다운로드
@@ -147,10 +150,9 @@ ${sanitized}
     const sanitized = stripStyles(editor.value);
     const out = `<!DOCTYPE html>
 <html>
-<head><meta charset="UTF-8"></head>
+<head><meta charset="UTF-8">${buildStyle()}</head>
 <body>
 ${sanitized}
-${buildStyle()}
 </body>
 </html>`;
     const blob = new Blob([out], { type: "text/html" });
