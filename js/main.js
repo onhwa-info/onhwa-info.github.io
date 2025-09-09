@@ -19,8 +19,6 @@ document.addEventListener("DOMContentLoaded", function() {
   const pMargin = document.getElementById("pMargin");
   const pPaddingLeft = document.getElementById("pPaddingLeft");
 
-  let htmlContent = "";
-
   // ----------------------------
   // HTML 파일 읽기
   // ----------------------------
@@ -29,46 +27,30 @@ document.addEventListener("DOMContentLoaded", function() {
     if (!file) return;
     const reader = new FileReader();
     reader.onload = (event) => {
-      htmlContent = event.target.result;
-      editor.value = htmlContent;
+      editor.value = event.target.result;
       updatePreview();
     };
     reader.readAsText(file);
   });
 
   // ----------------------------
-  // 스타일 빌드 (span 기존 스타일 유지, 중복 적용)
+  // 스타일 빌드 (span 기존 스타일 유지 + 중복 적용)
   // ----------------------------
   function buildStyle() {
     return `
       <style>
         .ccfolia_wrap { background-color: ${wrapBg.value}; padding: 10px; }
-        .msg_container { 
-          background: ${msgBg.value}; 
-          width: 40px; height: 40px; 
-          flex-shrink: 0; border-radius: 5px; 
-          display: flex; align-items: center; justify-content: center; 
-        }
+        .msg_container { background: ${msgBg.value}; width: 40px; height: 40px; flex-shrink: 0; border-radius: 5px; display: flex; align-items: center; justify-content: center; }
         .msg_container img { width: 40px; height: 40px; object-fit: cover; border-radius: 5px; }
-        /* span 기존 스타일 유지, 덮어씌우기 */
-        span { 
-          background: ${wrapBg.value} !important; 
-          color: ${spanColor.value} !important; 
-          padding: ${spanPadding.value}px !important; 
-        }
-        span, b { 
-          font-size: ${spanFontSize.value}px !important; 
-          font-family: ${fontFamily.value} !important; 
-          line-height: ${lineHeight.value} !important; 
-        }
-        b { 
-          color: ${bColor.value} !important; 
-          font-weight: bold; 
-        }
+        /* span 기존 스타일 유지 + 덮어쓰기 */
+        span { background: ${wrapBg.value}; color: ${spanColor.value}; padding: ${spanPadding.value}px !important; }
+        span, b { font-size: ${spanFontSize.value}px !important; font-family: ${fontFamily.value} !important; line-height: ${lineHeight.value} !important; }
+        b { color: ${bColor.value} !important; font-weight: bold; }
         .gap { padding: ${gapPadding.value}px; align-items: ${gapAlign.value}; display: flex; gap: 10px; }
         .gap p { margin: ${pMargin.value}px 0; padding-left: ${pPaddingLeft.value}px; }
         hr { display: none !important; }
-      </style>`;
+      </style>
+    `;
   }
 
   // ----------------------------
@@ -111,7 +93,6 @@ document.addEventListener("DOMContentLoaded", function() {
   // 동기화 버튼
   // ----------------------------
   syncBtn.addEventListener("click", () => {
-    htmlContent = editor.value;
     updatePreview();
   });
 
