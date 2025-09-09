@@ -38,43 +38,36 @@ document.addEventListener("DOMContentLoaded", function () {
   // 기존 스타일 제거(교체) 유틸
   // ----------------------------
   function stripConflictingStyles(html) {
-    // 1) 문서 내 스타일/외부 CSS 제거
-    html = html.replace(/<style[\s\S]*?<\/style>/gi, "");
-    html = html.replace(/<link[^>]*rel=["']?stylesheet["']?[^>]*>/gi, "");
+  // 1) 문서 내 style / link 제거
+  html = html.replace(/<style[\s\S]*?<\/style>/gi, "");
+  html = html.replace(/<link[^>]*rel=["']?stylesheet["']?[^>]*>/gi, "");
 
-    // 2) 우리가 관리하는 요소들의 인라인 style 제거 (교체 개념)
-    html = html.replace(/(<span\b[^>]*?)\s*style="[^"]*"/gi, "$1");
-    html = html.replace(/(<b\b[^>]*?)\s*style="[^"]*"/gi, "$1");
-    html = html.replace(/(<[^>]*class="[^"]*\bgap\b[^"]*"[^>]*?)\s*style="[^"]*"/gi, "$1");
-    html = html.replace(/(<[^>]*class="[^"]*\bccfolia_wrap\b[^"]*"[^>]*?)\s*style="[^"]*"/gi, "$1");
-    html = html.replace(/(<[^>]*class="[^"]*\bmsg_container\b[^"]*"[^>]*?)\s*style="[^"]*"/gi, "$1");
+  // 2) span 인라인 스타일은 지우지 않음 → CSS로 덮어쓰기
+  //    b, gap, wrap, msg_container 등은 기존대로 지움
+  html = html.replace(/(<b\b[^>]*?)\s*style="[^"]*"/gi, "$1");
+  html = html.replace(/(<[^>]*class="[^"]*\bgap\b[^"]*"[^>]*?)\s*style="[^"]*"/gi, "$1");
+  html = html.replace(/(<[^>]*class="[^"]*\bccfolia_wrap\b[^"]*"[^>]*?)\s*style="[^"]*"/gi, "$1");
+  html = html.replace(/(<[^>]*class="[^"]*\bmsg_container\b[^"]*"[^>]*?)\s*style="[^"]*"/gi, "$1");
 
-    return html;
-  }
-
-  // ----------------------------
-  // 우리 스타일 생성 (문서 끝에 삽입)
-  // ----------------------------
-  function hexToRgba(hex, alpha) {
-  const bigint = parseInt(hex.slice(1), 16);
-  const r = (bigint >> 16) & 255;
-  const g = (bigint >> 8) & 255;
-  const b = bigint & 255;
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  return html;
 }
 
 function buildStyle() {
-  const wrapColor = hexToRgba(wrapBg.value, wrapAlpha.value);
+  const wrapColor = wrapBg.value; // 투명도 제거 → hex 그대로
   const msgColor  = hexToRgba(msgBg.value, msgAlpha.value);
   const fs = `${spanFontSize.value}px`;
   const lh = `${lineHeight.value}`;
 
   return `
     <style>
-      .ccfolia_wrap { background-color: ${wrapColor}; }
-      .msg_container { background: ${msgColor}; }
+      .ccfolia_wrap {
+        background-color: ${wrapColor};
+      }
+      .msg_container {
+        background: ${msgColor};
+      }
       span {
-        background: ${wrapColor};
+        background: ${wrapColor}; /* wrapBg와 연동 */
         color: ${spanColor.value};
         padding: ${spanPadding.value}px;
         font-size: ${fs};
@@ -82,8 +75,7 @@ function buildStyle() {
         line-height: ${lh};
       }
       b {
-        color: ${spanColor.value};
-        padding: ${spanPadding.value}px;
+        color: ${bColor.value}; /* b를 독립적으로 */
         font-size: ${fs};
         font-family: ${fontFamily.value};
         line-height: ${lh};
@@ -97,6 +89,7 @@ function buildStyle() {
     </style>
   `;
 }
+
 
 // 옵션 변경/편집 반영
 function updatePreview(syncEditor = false) {
