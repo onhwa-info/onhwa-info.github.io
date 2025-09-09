@@ -22,21 +22,6 @@ document.addEventListener("DOMContentLoaded", function () {
   // ----------------------------
   // HTML 파일 읽기
   // ----------------------------
-  fileInput.addEventListener("change", (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      htmlContent = event.target.result;
-      editor.value = htmlContent;
-      updatePreview();
-    };
-    reader.readAsText(file);
-  });
-
-  // ----------------------------
-  // 기존 스타일 제거(교체) 유틸
-  // ----------------------------
   function stripConflictingStyles(html) {
   // 1) 문서 내 style / link 제거
   html = html.replace(/<style[\s\S]*?<\/style>/gi, "");
@@ -89,6 +74,7 @@ function buildStyle() {
     </style>
   `;
 }
+
 
 
 // 옵션 변경/편집 반영
