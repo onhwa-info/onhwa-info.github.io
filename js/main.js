@@ -41,8 +41,8 @@ document.addEventListener("DOMContentLoaded", function() {
   function updatePreview() {
     const style = `
       <style>
-        .ccfolia_wrap { background-color: ${wrapBg.value} !important; }
-        .msg_container { background: ${msgBg.value}!important; }
+        .ccfolia_wrap { background-color: ${wrapBg.value}de !important; }
+        .msg_container { background: ${msgBg.value}de!important; }
         span { background: ${spanBgColor.value}; color: ${spanColor.value}; padding: ${spanPadding.value}px; font-family: ${fontFamily.value}; line-height: ${lineHeight.value}; }
         b { color: ${bColor.value}; font-family: ${fontFamily.value}; line-height: ${lineHeight.value}; }
         span, b {font-size: ${spanFontSize.value}px; font-family: ${fontFamily.value}; line-height: ${lineHeight.value}; }
