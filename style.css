@@ -15,3 +15,8 @@ body {
   height: 400px;
   border: 1px solid #ccc;
 }
+
+.style-controls label {
+  display: block;
+  margin: 5px 0;
+}
