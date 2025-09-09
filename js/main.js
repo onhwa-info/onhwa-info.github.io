@@ -20,7 +20,6 @@ document.addEventListener("DOMContentLoaded", function() {
   const pMargin = document.getElementById("pMargin");
   const pPaddingLeft = document.getElementById("pPaddingLeft");
 
-
   let htmlContent = "";
 
   // ----------------------------
@@ -42,35 +41,34 @@ document.addEventListener("DOMContentLoaded", function() {
   // 스타일 생성
   // ----------------------------
   function buildStyle() {
-  return `
-    <style>
-      .ccfolia_wrap { background-color: ${wrapBg.value}; }
-      .msg_container { background: ${msgBg.value}; }
-      span { 
-        background: ${wrapBg.value}; 
-        color: ${spanColor.value}; 
-        padding: ${spanPadding.value}px; 
-      }
-      span, b { 
-        font-size: ${spanFontSize.value}px; 
-        font-family: ${fontFamily.value}; 
-        line-height: ${lineHeight.value}; 
-      }
-      b { color: ${bColor.value}; font-weight: bold; }
-      .gap { 
-        padding: ${gapPadding.value}px; 
-        align-items: ${gapAlign.value}; 
-        display: flex; 
-      }
-      .gap p {
-        margin: ${pMargin.value}px 0;
-        padding-left: ${pPaddingLeft.value}px; /* 옵션화된 값 */
-      }
-      hr { display: none !important; }
-    </style>
-  `;
-}
-
+    return `
+      <style>
+        .ccfolia_wrap { background-color: ${wrapBg.value}; }
+        .msg_container { background: ${msgBg.value}; }
+        span { 
+          background: ${wrapBg.value}; 
+          color: ${spanColor.value}; 
+          padding: ${spanPadding.value}px; 
+        }
+        span, b { 
+          font-size: ${spanFontSize.value}px; 
+          font-family: ${fontFamily.value}; 
+          line-height: ${lineHeight.value}; 
+        }
+        b { color: ${bColor.value}; font-weight: bold; }
+        .gap { 
+          padding: ${gapPadding.value}px; 
+          align-items: ${gapAlign.value}; 
+          display: flex; 
+        }
+        .gap p {
+          margin: ${pMargin.value}px 0;
+            padding-left: ${pPaddingLeft.value}px; /* 옵션화된 값 */
+        }
+        hr { display: none !important; }
+      </style>
+    `;
+  }
 
   // ----------------------------
   // 미리보기 업데이트
