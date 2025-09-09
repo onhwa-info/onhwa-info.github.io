@@ -1,35 +1,41 @@
 const iframe = document.getElementById('preview');
 const fileInput = document.getElementById('fileInput');
 
+// 샘플 파일 기본 로드
+fetch("sample_log.html")
+  .then(res => res.text())
+  .then(html => {
+    iframe.srcdoc = html;
+  });
+
 // 파일 업로드 → 미리보기 로드
 fileInput.addEventListener('change', () => {
   const file = fileInput.files[0];
+  if (!file) return;
   const reader = new FileReader();
   reader.onload = e => {
-    iframe.srcdoc = e.target.result;
+    iframe.srcdoc = e.target.result;  // iframe에 업로드한 html 반영
   };
   reader.readAsText(file);
 });
 
-// 샘플 파일 기본 로드
-fetch("sample_log.html")
-  .then(res => res.text())
-  .then(html => { iframe.srcdoc = html; });
-
+// HR 삭제 기능
 function removeHR() {
   const doc = iframe.contentDocument;
+  if (!doc) return;
   doc.querySelectorAll("hr").forEach(el => el.remove());
 }
 
+// 스타일 변경 적용
 function applyChanges() {
   const doc = iframe.contentDocument;
+  if (!doc) return;
 
   // 판정 span 스타일
-  const spanStyle = doc.querySelector('span[style*="background"]');
-  if (spanStyle) {
-    spanStyle.style.background = document.getElementById('spanBg').value;
-    spanStyle.style.padding = document.getElementById('spanPadding').value + "px";
-  }
+  doc.querySelectorAll('span[style*="background"]').forEach(span => {
+    span.style.background = document.getElementById('spanBg').value;
+    span.style.padding = document.getElementById('spanPadding').value + "px";
+  });
 
   // 전역 폰트
   doc.querySelectorAll("span, b").forEach(el => {
