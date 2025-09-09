@@ -10,16 +10,17 @@
 
 <div class="controls">
   <input type="file" id="fileInput" accept=".html">
-  <button id="beautifyBtn">뷰티파이</button>
   <button id="downloadBtn">다운로드</button>
+  <button id="syncBtn">동기화</button>
 </div>
 
 <h2>스타일 옵션</h2>
 <div class="style-controls">
-  <label>span 배경색(.ccfolia_wrap 연동): <input type="color" id="spanBgColor" value="#2c2c2cde"></label>
+  <label>.ccfolia_wrap 배경색: <input type="color" id="wrapBg" value="#2c2c2cde"></label>
+  <label>.msg_container 배경색: <input type="color" id="msgBg" value="#00000033"></label>
   <label>span 글자색: <input type="color" id="spanColor" value="#ffffff"></label>
   <label>span padding(px): <input type="number" id="spanPadding" value="5"></label>
-  <label>span,b 글꼴 크기(px): <input type="number" id="spanFontSize" value="14"></label>
+  <label>span, b 글꼴 크기(px): <input type="number" id="spanFontSize" value="14"></label>
   <label>b 글자색: <input type="color" id="bColor" value="gray"></label>
   <label>글꼴: <input type="text" id="fontFamily" value="Arial"></label>
   <label>줄간격(line-height): <input type="number" step="0.1" id="lineHeight" value="1.5"></label>
@@ -31,13 +32,13 @@
       <option value="flex-end">flex-end</option>
     </select>
   </label>
-  <label>.ccfolia_wrap 배경색: <input type="color" id="wrapBg" value="#2c2c2cde"></label>
-  <label>.msg_container 배경색: <input type="color" id="msgBg" value="#00000033"></label>
   <label>p margin(px): <input type="number" id="pMargin" value="4"></label>
   <label>p padding-left(px): <input type="number" id="pPaddingLeft" value="8"></label>
 </div>
 
-<textarea id="editor"></textarea>
+<textarea id="editor" placeholder="HTML 코드 편집용"></textarea>
+
+<h2>렌더링 미리보기</h2>
 <iframe id="previewFrame"></iframe>
 
 <script src="js/main.js"></script>
