@@ -4,45 +4,80 @@ const previewFrame = document.getElementById("previewFrame");
 const beautifyBtn = document.getElementById("beautifyBtn");
 const downloadBtn = document.getElementById("downloadBtn");
 
+// 스타일 컨트롤
+const spanBgColor = document.getElementById("spanBgColor");
+const spanColor = document.getElementById("spanColor");
+const spanPadding = document.getElementById("spanPadding");
+const spanFontSize = document.getElementById("spanFontSize");
+const bColor = document.getElementById("bColor");
+const fontFamily = document.getElementById("fontFamily");
+const lineHeight = document.getElementById("lineHeight");
+const gapPadding = document.getElementById("gapPadding");
+const gapAlign = document.getElementById("gapAlign");
+const wrapBg = document.getElementById("wrapBg");
+const msgBg = document.getElementById("msgBg");
+
 // ----------------------------
-// HTML 뷰티파이 함수 (들여쓰기 정리)
+// HTML 뷰티파이 함수
 // ----------------------------
 function beautifyHTML(code) {
   const tab = "  ";
   let result = "", indent=0;
-
-  // 단순히 태그 기준으로 들여쓰기
   code.split(/>\s*</).forEach((element) => {
     if (element.match(/^\/\w/)) indent--;
     result += tab.repeat(indent) + "<" + element + ">\n";
     if (element.match(/^<?\w[^>]*[^\/]$/) && !element.startsWith("!")) indent++;
   });
 
+  // 모든 <hr> 제거
+  result = result.replace(/<hr[^>]*>/gi, '');
   return result.trim();
 }
 
 // ----------------------------
-// 파일 업로드 → textarea에 표시 + 미리보기 갱신
+// 파일 업로드 → 에디터 + 미리보기
 // ----------------------------
-fileInput.addEventListener("change", (event) => {
-  const file = event.target.files[0];
+fileInput.addEventListener("change", (e) => {
+  const file = e.target.files[0];
   if (!file) return;
 
   const reader = new FileReader();
-  reader.onload = (e) => {
-    editor.value = e.target.result;
+  reader.onload = (event) => {
+    editor.value = event.target.result;
     updatePreview();
   };
   reader.readAsText(file);
 });
 
 // ----------------------------
-// textarea 입력 시 실시간 미리보기
+// 에디터 입력 시 실시간 미리보기
 // ----------------------------
 editor.addEventListener("input", updatePreview);
 
+// ----------------------------
+// 스타일 변경 시 반영
+// ----------------------------
+[
+  spanBgColor, spanColor, spanPadding, spanFontSize,
+  bColor, fontFamily, lineHeight, gapPadding, gapAlign, wrapBg, msgBg
+].forEach(el => el.addEventListener("input", updatePreview));
+
 function updatePreview() {
-  previewFrame.srcdoc = editor.value;
+  let html = editor.value;
+
+  // 사용자 스타일 삽입
+  const style = `
+    <style>
+      .ccfolia_wrap { background-color: ${wrapBg.value}; }
+      .msg_container { background: ${msgBg.value}; }
+      span { background: ${spanBgColor.value}; color: ${spanColor.value}; padding: ${spanPadding.value}px; font-size: ${spanFontSize.value}px; font-family: ${fontFamily.value}; line-height: ${lineHeight.value}; }
+      b { color: ${bColor.value}; font-family: ${fontFamily.value}; line-height: ${lineHeight.value}; }
+      span, b { font-family: ${fontFamily.value}; line-height: ${lineHeight.value}; }
+      .gap { padding: ${gapPadding.value}px; align-items: ${gapAlign.value}; }
+    </style>
+  `;
+
+  previewFrame.srcdoc = style + html;
 }
 
 // ----------------------------
